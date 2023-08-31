@@ -57,6 +57,14 @@ def genKVPairForStar(word_list: list) -> dict:
     # print(d)
     return d;  
 
+# Well I can optimise it possibly but this might work as well.
+def isCompleted(d: dict, word_list: list) -> bool:
+    for i in word_list:
+        if(i not in d.keys()):
+            return False
+
+    return True
+
 def construct(file_str: str) -> dict[str, dict[str, float]]:
     """Takes in the string representing the file and returns pfsa
     The given example is for the statement "A cat"
@@ -70,12 +78,13 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
     word_list = ["ansh", "hello", "hi", "hungama", "hujhsj", "hu", "hujhjk"]
     pfsa["*"] = genKVPairForStar(word_list)["*"]
 
-    p = list(pfsa.keys())
-    
-    for i in p:
-        for j in pfsa[i].keys():
-            if(j not in pfsa):
-                pfsa[j] = generateKeyValuePair(j, getProbabilities(j, word_list))[j]
+    while(not isCompleted(pfsa, word_list)):
+        p = list(pfsa.keys())
+        
+        for i in p:
+            for j in pfsa[i].keys():
+                if(j not in pfsa):
+                    pfsa[j] = generateKeyValuePair(j, getProbabilities(j, word_list))[j]
 
     print(pfsa)
     # Pseudocode: Algorithm:
