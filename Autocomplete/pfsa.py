@@ -2,6 +2,30 @@ import argparse
 import pytest
 import json
 
+def getProbabilities(prefix: str, start_index: int, word_list: list)->dict:
+    l = dict()
+    
+    for i in range(len(word_list)):
+        if(word_list[i][:len(prefix)] == prefix):
+            #if(len(word_list[i]) > i + 1): # Checking if the word that we have found is of greater length than prefix
+            if(len(word_list[i]) > len(prefix)):
+                next_letter = word_list[i][len(prefix):len(prefix) + 1]
+                if(next_letter in l.keys()):
+                    l[next_letter] += 1
+                else:
+                    l[next_letter] = 1
+            elif(word_list[i] == prefix):
+                l["*"] = 1
+    # print(l)
+
+    sum_ = 0
+    for i in l.keys():
+        sum_ += l[i]
+    # print(sum_)
+    for i in l.keys():
+        l[i] /= sum_
+    # print(l)
+    return l;    
 
 def construct(file_str: str) -> dict[str, dict[str, float]]:
     """Takes in the string representing the file and returns pfsa
@@ -11,10 +35,18 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
 
     chars = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split()
     
-    print(chars)
     pfsa = dict()
 
+    word_list = ["ansh", "hello", "hi", "hungama", "hujhsj", "hu", "hujhjk"]
+    getProbabilities("hu", 1, word_list)
     
+    # Pseudocode: Algorithm:
+    '''
+    Pick a letter that is there in the keys of *
+    Then see which all words have their first letter as the chose letter x, then for x make probabilty thing and
+    do until the last such thing in the main object does not have any states which are not end states.
+    
+    '''
     
     return {
         "*": {"a": 0.5, "c": 0.5},
