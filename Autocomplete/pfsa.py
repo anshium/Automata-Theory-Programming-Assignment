@@ -2,7 +2,7 @@ import argparse
 import pytest
 import json
 
-def getProbabilities(prefix: str, start_index: int, word_list: list)->dict:
+def getProbabilities(prefix: str, word_list: list)->dict:
     l = dict()
     
     for i in range(len(word_list)):
@@ -24,8 +24,38 @@ def getProbabilities(prefix: str, start_index: int, word_list: list)->dict:
     # print(sum_)
     for i in l.keys():
         l[i] /= sum_
+        l[i] = round(l[i], 2)
     # print(l)
     return l;    
+
+def generateKeyValuePair(prefix: str, probabilities: dict)->dict:
+    # Gives a dict of only one element. Can there be a more efficient DS for this?
+    d = dict()
+    d[prefix] = dict()
+
+    for key in probabilities:
+        d[prefix][prefix + key] = probabilities[key]
+    print(d)
+    return d
+
+def genKVPairForStar(word_list: list) -> dict:
+    d = dict()
+    d["*"] = dict()
+    for i in range(len(word_list)):
+        letter = word_list[i][0]
+        if(letter in d["*"].keys()):
+            d["*"][letter] += 1
+        else:
+            d["*"][letter] = 1
+
+    sum_ = 0
+    for i in d["*"].keys():
+        sum_ += d["*"][i]
+    for i in d["*"].keys():
+        d["*"][i] /= sum_
+        d["*"][i] = round(d["*"][i], 2)
+    # print(d)
+    return d;  
 
 def construct(file_str: str) -> dict[str, dict[str, float]]:
     """Takes in the string representing the file and returns pfsa
@@ -38,8 +68,16 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
     pfsa = dict()
 
     word_list = ["ansh", "hello", "hi", "hungama", "hujhsj", "hu", "hujhjk"]
-    getProbabilities("hu", 1, word_list)
+    pfsa["*"] = genKVPairForStar(word_list)["*"]
+
+    p = list(pfsa.keys())
     
+    for i in p:
+        for j in pfsa[i].keys():
+            if(j not in pfsa):
+                pfsa[j] = generateKeyValuePair(j, getProbabilities(j, word_list))[j]
+
+    print(pfsa)
     # Pseudocode: Algorithm:
     '''
     Pick a letter that is there in the keys of *
