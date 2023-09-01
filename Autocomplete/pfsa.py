@@ -71,7 +71,13 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
     """
     # TODO: FILL IN THIS FUNCTION
 
-    chars = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split()
+    # Pseudocode: Algorithm:
+    '''
+    Pick a letter that is there in the keys of *
+    Then see which all words have their first letter as the chose letter x, then for x make probabilty thing and
+    do until the last such thing in the main object does not have any states which are not end states.
+    
+    '''
     
     pfsa = dict()
 
@@ -86,14 +92,17 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
                 if(j not in pfsa):
                     pfsa[j] = generateKeyValuePair(j, getProbabilities(j, word_list))[j]
 
-    print(pfsa)
-    # Pseudocode: Algorithm:
-    '''
-    Pick a letter that is there in the keys of *
-    Then see which all words have their first letter as the chose letter x, then for x make probabilty thing and
-    do until the last such thing in the main object does not have any states which are not end states.
+    # print(pfsa)
+
+    # Then remove the cases where final states are keys:
+
+    pfsakeys = list(pfsa.keys())
     
-    '''
+    for ds in pfsakeys:
+        if(ds[-1] == "*"):
+            del pfsa[ds]
+
+    print(pfsa)
     
     return {
         "*": {"a": 0.5, "c": 0.5},
