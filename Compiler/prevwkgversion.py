@@ -1,3 +1,4 @@
+
 ##################### BOILERPLATE BEGINS ############################
 
 # Token types enumeration
@@ -120,15 +121,8 @@ symbols = ['+', '-', '*', '/', '^', '<', '>', '=']
 # 1. else before if
 # 2. Only else, no if
 # 3. empty initial statement
-# 4. condition statement after `if` is not valid
-# 5. Empty statement where a statement was expected
-# So how about just having a few flags for this
-
-else_before_if = 0
-only_else_no_if = 0
-empty_init_statement = 0
-condition_statement_after_if_not_valid = 0
-em_st_wh_a_st_wa_ex = 0
+# 4. condition statement in if not valid
+# 5. 
 
 def isStatementAlphabet(smtg: str) -> bool:
     if(smtg == 'if' or smtg == 'else'):
@@ -197,8 +191,8 @@ def checkAndGetCondPartEnd(string: str) -> list:
     # Go on until there is a case where there is an x and then put a mark there
 
     tokens = tokenize(string)
-    print("1234:", tokens)
-    valid = 1
+    
+    valid = 0
 
     count = 0
 
@@ -208,19 +202,18 @@ def checkAndGetCondPartEnd(string: str) -> list:
         if(count % 2 == 0):
             if(not isx(i[1])):
                 valid = 0
-                print("h1")
                 break
+##            end_token = i
+            valid = 1
         if(count % 2 == 1):
             if(i[1] not in symbols):
-                print("h2")
                 end_token = i
                 valid = 1
                 break
-        end_token = i
         count += 1
     f = 0
     if(valid):  
-        f = string.find(end_token[1]) #+ len(end_token[1])
+        f = string.find(end_token) #+ len(end_token[1])
     
     return [valid, f]
     
@@ -229,11 +222,6 @@ def checkGrammar(source_code, tokens) -> bool:
     # You CAN use other helper functions and create your own helper functions if needed
 
 ##    source_code = ' '.join([i[1] for i in tokens])
-
-    if(len(source_code.replace(' ', '')) == 0):
-        print("SyntaxError: Source Code cannot be all spaces or empty.")
-        return 0
-##        raise SyntaxError("Source Code cannot be all spaces or empty.")
     
     Q = [source_code]
 
@@ -242,26 +230,19 @@ def checkGrammar(source_code, tokens) -> bool:
         s = Q.pop(0)
 
         s = " " + s + " " # doing this to avoid find malfunctionality just in case
-        print(s)
+
         find_result_if = s.find(" if ") # length is 4
         if(find_result_if == -1):
             if(isYConcat(s)):
                 continue
-##            if(" else " in s):
-##                only_else_no_if = 1
-##                print("SyntaxError: An if was not found before an else.")
+            print("Non terminating:", s)
             return 0
         
         statement1 = s[:find_result_if]
         statement2 = s[find_result_if + 4:]
         statement1 = " " + statement1 + " "
-        # if len(statement1.replace(' ', '')) != 0:
         Q.append(statement1)
         statement2 = " " + statement2 + " "
-        #if len(statement2.replace(' ', '')) != 0:
-        Q.append(statement2)
-        print("S1:", statement1)
-        print("S2:", statement2)
         
         find_result_else = statement2.rfind(" else ")
         
@@ -271,18 +252,13 @@ def checkGrammar(source_code, tokens) -> bool:
             statement2 = statement2[:find_result_else]
             print("S3:", statement3)
             print("S2:", statement2)
-
-        print("70115:", statement2)
-        condPartEnd = checkAndGetCondPartEnd(statement2)
-        print("03797:", condPartEnd)
-        if(condPartEnd[0] == 0):
-            condition_statement_after_if_not_valid = 1
-            print("SyntaxError: Condition statement after if is not valid/present")
-            return 0
         
+        condPartEnd = checkAndGetCondPartEnd(statement2)
+        if(condPartEnd[0] == 0):
+            print("Conditional error")
+            return 0
         print("84460:", statement2[condPartEnd[1]:])
-        if(condPartEnd[0] == 1):
-            Q.append(statement2[condPartEnd[1]:])
+        Q.append(statement2[condPartEnd[1]:])
         
 
     return 1
