@@ -2,6 +2,9 @@
 
 # Token types enumeration
 ##################### YOU CAN CHANGE THE ENUMERATION IF YOU WANT #######################
+from secrets import token_urlsafe
+
+
 class TokenType:
     IDENTIFIER = "IDENTIFIER"
     KEYWORD = "KEYWORD"
@@ -19,7 +22,6 @@ token_hierarchy = {
 
 # helper function to check if it is a valid identifier
 def is_valid_identifier(lexeme):
-    # Kya matlab? 
     if not lexeme:
         return False
 
@@ -41,7 +43,6 @@ def tokenize(source_code):
     position = 0
 
     while position < len(source_code):
-        
         # Helper function to check if a character is alphanumeric
         def is_alphanumeric(char):
             return char.isalpha() or char.isdigit() or (char=='_')
@@ -113,115 +114,86 @@ def tokenize(source_code):
 
 ########################## BOILERPLATE ENDS ###########################
 
+symbols = ['+', '-', '*', '/', '^', '<', '>', '=']
+
 def isStatementAlphabet(smtg: str) -> bool:
     if(smtg == 'if' or smtg == 'else'):
         return 0
     if(smtg.isnumeric()):
         return 1
-    if(token_hierarchy[smtg] == TokenType.KEYWORD):
+    if(smtg in token_hierarchy):
         return 1
     if(is_valid_identifier(smtg)):
         return 1
     return 0
-    
-states = [
-    1,              # Statement
-    2,              # if A
-    3,              # (statement)(statement)
-    4,              # y
-    5,              # A (special statement inside if
-    6,              # (cond)(statement)
-    7,              # (cond)(statement)(else)(statement)
-    8,              # (cond)
-    9,              # (x)(op1)(x)
-    10,             # x
-    11,             # op1
-    12,             # set 12 [+, -, *, /, ^, <, >, =] <-- Hey last mein smiley ban gayi
-    13,             # R (Real numbers)
 
-]
-
-# Now I need transitions and mechanisms to check if a particular string is within that state
-
-# Second part looks more interesting at this point of time, let's do that first.
-class StateChecker:
-    def __init__(self):
-        self.symbols = ['+', '-', '*', '/', '^', '<', '>', '=']
-    
-    # State 1
-    def inState1(self, string: str) -> bool:
-        # C'mon man string would be a string
+def isx(string: str) -> bool:
+    # x ko main detect karne ke liye x->cond wali statement na bhi daalun to chalega
+    # because I am considering condition -> x(op1)x(op1)x(op1)x...
+    if(string.isnumeric() or isStatementAlphabet(string)):
         return 1
-    # State 13
-    def inState13(self, string: str) -> bool:
-        if(string.isnumeric()):
-            return 1
-        return 0
-    # State 12
-    def inState12(self, string: str) -> bool:
-        if(string in self.symbols):
-            return 1
-        return 0
-    # State 11
-    # Hmm, redundant state then
-    def inState11(self, string: str) -> bool:
-        return self.inState12()
+    return 0
 
-    # State 4
-    def isStatementAlphabet(self, smtg: str) -> bool:
-        if(smtg == 'if' or smtg == 'else'):
-            return 0
-        if(smtg.isnumeric()):
-            return 1
-        if(token_hierarchy[smtg] == TokenType.KEYWORD):
-            return 1
-        if(is_valid_identifier(smtg)):
-            return 1
+def isCond(string: str) -> bool:
+    # A condition can be identified if it is of the form when the even indices (0-indexed) are xs and the odd ones are symbols
+
+    # y cannot be null (is my assumption) <<<
+
+    # count number of non space characters
+    num_chars = 0
+    for i in string:
+        if(i != ' '):
+            num_chars += 1
+
+    if(num_chars % 2 == 0):
         return 0
 
-    # State 10
-    # x
-    def inState10(self, string: str) -> bool:
-        if(self.inState13(string) or self.isStatementAlphabet(string) or 0):
-            return 1
-        return 0
+    string = string.replace(' ', '')
 
-    # State 8
-    # check if cond
-    # So check if it can be broken into 3 pieces
-    def inState8(self, string: str) -> bool:
-        symbol = ""
-        found_symbol = 0
-        for i in string:
-            if i in self.symbols:
-                symbol = i
-                found_symbol = 1
-        if(not found_symbol):
-            return 0
+    for i in len(string):
+        if(i % 2 == 0):
+            if(not isx(string[i])):
+                return 0
+        if(i % 2 == 1):
+            if(string[i] not in symbols): # symbols === op1
+                return 0
 
-        l = string.split(symbol)
-        if(self.inState10(l[0]) and self.inState10(l[1])):
-            pass
+    return 1       
 
-# Transitions
+# I thought about the grammar and found that I can have a queue using a list in py and then I can split at if
+# and then 
 
-
-def checkGrammar(tokens):
+# Case 1: no if [Passed!]
+def checkGrammar(tokens) -> bool:
     # write the code the syntactical analysis in this function
     # You CAN use other helper functions and create your own helper functions if needed
-    pass
-    
 
+    if_present = 0
+    # Check for case 1
+    for i in tokens:
+        if(i[1] == "if"):
+            if_present = 1
+    
+    if(not if_present):
+        for i in tokens:
+            print(i[1])
+            if(isStatementAlphabet(i[1]) == 0):
+                return 0
+        return 1
+    else:
+        return 1
 
 # Test the tokenizer
 if __name__ == "__main__":
-    s = StateChecker()
-    print(s.inState13("123"))
-    # source_code = "if 2+xi > 0 print 2.0 else print -1;"
-    source_code = 'print hello if x > 2 print hello else -1'
-    tokens = tokenize(source_code)
+	# source_code = "if 2+xi > 0 print 2.0 else print -1;"
+	source_code = input()
+	tokens = tokenize(source_code)
 
-    for token in tokens:
-        print(f"Token Type: {token[0]}, Token Value: {token[1]}")
+	for token in tokens:
+		print(f"Token Type: {token[0]}, Token Value: {token[1]}")
 
-    logs = checkGrammar(tokens)  # You are tasked with implementing the function checkGrammar
+	logs = checkGrammar(tokens)  # You are tasked with implementing the function checkGrammar
+	if(logs == 1):
+		print("Yes, ok!")
+	else:
+		print("Not ok")
