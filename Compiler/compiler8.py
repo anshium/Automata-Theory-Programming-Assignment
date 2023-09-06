@@ -187,7 +187,7 @@ def isYConcat(string) -> bool:
     for i in tokens:
         if(i[1] == "if" or i[1] == "else"):
             return 0
-        if(i[0] == TokenType.SYMBOL):
+        if(i[0] in TokenType.SYMBOL):
             return 0
         if(i[0] == TokenType.IDENTIFIER or i[0] == TokenType.KEYWORD or i[0].isnumeric()):
             continue
@@ -293,12 +293,14 @@ def checkGrammar(source_code, tokens) -> bool:
 
         find_result_if = s.find(" if ") # length is 4
         if(find_result_if == -1):
-            if(isYConcat(s)):
-                continue
             if(" else" in s):
                 print("SyntaxError: An if was not found before an else.")
                 return 0
-        
+            if(isYConcat(s)):
+                continue
+            else:
+                print("SyntaxError: Statements cannot have symbols without being part of condition of an if statement.")
+                return 0
         statement1 = s[:find_result_if]
         statement2 = s[find_result_if + 4:]
         

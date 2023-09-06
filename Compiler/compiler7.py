@@ -133,7 +133,7 @@ def isAllSpaces(string: str) -> bool:
 def isStatementAlphabet(smtg: str) -> bool:
     if(smtg == 'if' or smtg == 'else'):
         return 0
-    if(smtg.isnumeric()):
+    if(tokenize(smtg)[0][0] == TokenType.FLOAT or tokenize(smtg)[0][0] == TokenType.INTEGER):
         return 1
     if(smtg in token_hierarchy):
         return 1
@@ -200,7 +200,6 @@ def checkAndGetCondPartEnd(string: str) -> list:
     # Go on until there is a case where there is an x and then put a mark there
 
     tokens = tokenize(string)
-    
     valid = 0
 
     count = 0
@@ -217,14 +216,12 @@ def checkAndGetCondPartEnd(string: str) -> list:
             if(tokens.index(i) < len(tokens) - 1):
                 end_token = tokens[tokens.index(i) + 1]
                 
-            else:
-               
+            else:   
                 no_statement_after_condition = 1
                 end_token = i 
                 valid = 1
         if(count % 2 == 1):
-           
-            if(i[1] not in symbols):
+            if(i[0] not in symbols):
                 end_token = i
                 valid = 1
                 break
@@ -288,15 +285,18 @@ def checkGrammar(source_code, tokens) -> bool:
     
     while(len(Q) != 0):
         s = Q.pop(0)
-
+        print(s)
         s = " " + s + " " # doing this to avoid find malfunctionality just in case
 
         find_result_if = s.find(" if ") # length is 4
         if(find_result_if == -1):
-            if(isYConcat(s)):
-                continue
             if(" else" in s):
                 print("SyntaxError: An if was not found before an else.")
+                return 0
+            if(isYConcat(s)):
+                continue
+            else:
+                print("SyntaxError: Statements cannot have symbols without being part of condition of an if statement.")
                 return 0
         
         statement1 = s[:find_result_if]
@@ -305,8 +305,6 @@ def checkGrammar(source_code, tokens) -> bool:
         statement1 = " " + statement1 + " "
         Q.append(statement1)
         statement2 = " " + statement2 + " "
-
-        
         
         find_result_else = findElseInString(statement2)# statement2.find(" else ")
         
@@ -321,14 +319,13 @@ def checkGrammar(source_code, tokens) -> bool:
         
         condPartEnd = checkAndGetCondPartEnd(statement2)
         if(no_statement_after_condition == 1):
-            print("SyntaxError: Missing statement after condition.")
+            print("SyntaxError: Missing statement after condition of if.")
             return 0
         if(condPartEnd[0] == 0):
             print("SyntaxError: Condition after if invalid/missing.")
             return 0
         
-        Q.append(statement2[condPartEnd[1]:])
-        
+        Q.append(statement2[condPartEnd[1]:])        
 
     return 1
             

@@ -1,0 +1,40 @@
+$lines = @(
+    "",
+    ";",
+    ":",
+    "%",
+    "[]",
+    "()",
+    "*",
+    "^ d",
+    "a - c",
+    "a -",
+    "a +",
+    "if",
+    "if a",
+    "if /",
+    "if a + b",
+    "if + b",
+    "if * b",
+    "if c + * d",
+    "if c + - -4",
+    "if b -",
+    "if b *",
+    "else",
+    "else a",
+    "if c else d",
+    "if c b else",
+    "if d a + b",
+    "if else",
+    "if a + if print -4",
+    "if a + else + test print k",
+    "if a print b else print c else print d",
+    "if if a + b > c print b",
+    "print -i",
+    "if c % l print a",
+    "if a if b else else d"
+)
+
+foreach ($line in $lines) {
+    echo "$line" | python.exe .\compiler8.py # >> output.txt
+}

@@ -144,7 +144,8 @@ def isStatementAlphabet(smtg: str) -> bool:
 def isx(string: str) -> bool:
     # x ko main detect karne ke liye x->cond wali statement na bhi daalun to chalega
     # because I am considering condition -> x(op1)x(op1)x(op1)x...
-    if(string.isnumeric() or isStatementAlphabet(string)):
+    token = tokenize(string)[0]
+    if(token[0] == TokenType.INTEGER or token[0] == TokenType.FLOAT or isStatementAlphabet(string)):
         return 1
     return 0
 
@@ -207,6 +208,7 @@ def checkAndGetCondPartEnd(string: str) -> list:
     end_token = ""
     print("206:", tokens)
     for i in tokens:
+        print("9876:", i)
         if(count % 2 == 0):
             print("Here209")
             print("210:", tokens.index(i))
@@ -322,6 +324,7 @@ def checkGrammar(source_code, tokens) -> bool:
             statement2 = statement2[:find_result_else]
         
         condPartEnd = checkAndGetCondPartEnd(statement2)
+        print(condPartEnd)
         print(no_statement_after_condition)
         if(no_statement_after_condition == 1):
             print("SyntaxError: Missing statement after condition.")
