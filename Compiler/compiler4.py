@@ -169,7 +169,7 @@ def isCond(string: str) -> bool:
             if(string[i] not in symbols): # symbols === op1
                 return 0
 
-    return 1       
+    return 1
 
 # I thought about the grammar and found that I can have a queue using a list in py and then I can split at if
 # and then 
@@ -206,7 +206,7 @@ def checkAndGetCondPartEnd(string: str) -> list:
             if(not isx(i[1])):
                 valid = 0
                 break
-##            end_token = i
+            end_token = i
             valid = 1
         if(count % 2 == 1):
             if(i[1] not in symbols):
@@ -252,7 +252,7 @@ def checkGrammar(source_code, tokens) -> bool:
         Q.append(statement1)
         statement2 = " " + statement2 + " "
         
-        find_result_else = statement2.rfind(" else ")
+        find_result_else = statement2.find(" else ")
         
         if(find_result_else != -1):
             statement3 = statement2[find_result_else + 6:]
