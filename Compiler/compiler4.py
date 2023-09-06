@@ -123,6 +123,9 @@ symbols = ['+', '-', '*', '/', '^', '<', '>', '=']
 # 3. empty initial statement
 # 4. condition statement in if not valid
 # 5. Empty statement where a statement was expected
+# 6. No statement after condition.
+
+no_statement_after_condition = 0
 
 def isAllSpaces(string: str) -> bool:
     return len(string.replace(' ', '')) == 0
@@ -199,22 +202,36 @@ def checkAndGetCondPartEnd(string: str) -> list:
 
     count = 0
 
-    end_token = ""
+    global no_statement_after_condition # Was missing to write this earlier
     
+    end_token = ""
+    print("206:", tokens)
     for i in tokens:
         if(count % 2 == 0):
+            print("Here209")
+            print("210:", tokens.index(i))
             if(not isx(i[1])):
+                print("Here211")
                 valid = 0
                 break
-            end_token = i
-            valid = 1
+            if(tokens.index(i) < len(tokens) - 1):
+                end_token = tokens[tokens.index(i) + 1]
+                print("Here")
+                print(end_token)
+            else:
+                print("here219")
+                no_statement_after_condition = 1
+                end_token = i 
+                valid = 1
         if(count % 2 == 1):
+            print("Here")
             if(i[1] not in symbols):
                 end_token = i
                 valid = 1
                 break
         count += 1
     f = 0
+    print("ET:", end_token)
     if(valid):  
         f = string.find(end_token[1]) #+ len(end_token[1])
     
@@ -248,6 +265,7 @@ def checkGrammar(source_code, tokens) -> bool:
         
         statement1 = s[:find_result_if]
         statement2 = s[find_result_if + 4:]
+        print("70115:", statement2)
         statement1 = " " + statement1 + " "
         Q.append(statement1)
         statement2 = " " + statement2 + " "
@@ -259,10 +277,16 @@ def checkGrammar(source_code, tokens) -> bool:
             if(isAllSpaces(statement3)):
                print("SyntaxError: Missing statement after else.")
                return 0
+            statement3 = " " + statement3
             Q.append(statement3)
             statement2 = statement2[:find_result_else]
         
         condPartEnd = checkAndGetCondPartEnd(statement2)
+        print(no_statement_after_condition)
+        if(no_statement_after_condition == 1):
+            print("SyntaxError: Missing statement after condition.")
+            return 0
+        print(condPartEnd)
         if(condPartEnd[0] == 0):
             print("SyntaxError: Condition after if invalid/missing.")
             return 0
