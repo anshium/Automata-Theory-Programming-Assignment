@@ -35,7 +35,7 @@ def generateKeyValuePair(prefix: str, probabilities: dict)->dict:
 
     for key in probabilities:
         d[prefix][prefix + key] = probabilities[key]
-    print(d)
+##    print(d)
     return d
 
 def genKVPairForStar(word_list: list) -> dict:
@@ -81,9 +81,14 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
     
     pfsa = dict()
 
-    word_list = ["ansh", "hello", "hi", "hungama", "hujhsj", "hu", "hujhjk"]
+    word_list = file_str.split()
+##    word_list = "A cat".split()
+    for i in range(len(word_list)):
+        word_list[i] = word_list[i].lower()
+##    print(word_list)
+    
     pfsa["*"] = genKVPairForStar(word_list)["*"]
-
+    
     while(not isCompleted(pfsa, word_list)):
         p = list(pfsa.keys())
         
@@ -99,18 +104,10 @@ def construct(file_str: str) -> dict[str, dict[str, float]]:
     pfsakeys = list(pfsa.keys())
     
     for ds in pfsakeys:
-        if(ds[-1] == "*"):
+        if(ds[-1] == "*" and ds != "*"):
             del pfsa[ds]
-
-    print(pfsa)
-    
-    return {
-        "*": {"a": 0.5, "c": 0.5},
-        "a": {"a*": 1.0},
-        "c": {"ca": 1.0},
-        "ca": {"cat": 1.0},
-        "cat": {"cat*": 1.0},
-    }
+##    print(pfsa)
+    return pfsa
 
 
 def main():

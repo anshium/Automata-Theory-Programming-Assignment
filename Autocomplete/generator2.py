@@ -3,48 +3,33 @@ import pytest
 import json
 import random
 
+def getRandomPrefix(pfsa: dict[str, dict[str, float]], key: str) -> str:
+    result = random.choices([i for i in list(pfsa[key].keys())], weights = [pfsa[key][i] for i in list(pfsa[key].keys())])
+
+    return result
+
 def generate(pfsa: dict[str, dict[str, float]], word_count: int) -> str:
     """Takes in the PFSA and generates a string of `word_count` number of words
     The following string is when the input has only "Cat" as in it's PFSA with
     count of 4.
     """
-    # TODO: FILE IN THIS FUNCTION
 
-    # Well I don't know if this is correct, but let's see.
-    rand_val = random.random()
-    print(rand_val)
-
-    l = []
-    words = []
+    returnString = str()
     for i in range(word_count):
-        word = ""
-        for start_state in list(pfsa.keys()):
-            pfsa_start_state = pfsa[start_state]
-            par_keys = list(pfsa[start_state].keys())
-            if(len(list(par_keys)) == 1):
-                word += pfsa[start_state][par_keys[0]]
-                continue
-            rand_value = random.random()
-            next_letter = par_keys[0]
-            equals = []
-            equal_validity_bit = 1
-            for k in range(len(list(par_keys))):
-                if(pfsa_start_state[par_keys[k]] > rand_val):
-                    if(pfsa_start_state[par_keys[k]] == pfsa_start_state[next_letter]):
-                        equals.append(pfsa_start_state[par_keys[k]])
-                    elif(pfsa_start_state[par_keys[k]] < pfsa_start_state[next_letter]):
-                        equals = []
-                        equals.append(pfsa_start_state[par_keys[k]])
-                        next_letter = par_keys[k]
-            word = word + random.choice(equals)
-        words.append(word)
-    print(words)
-            
-    return_string = ''.join(words)
-            
-    
-    return return_string
+        firstChoice = random.choices([i for i in list(pfsa["*"].keys())], weights = [pfsa["*"][i] for i in list(pfsa["*"].keys())])
 
+        key = firstChoice[0]
+        word = key
+        while(word[-1] != "*"):
+            word = getRandomPrefix(pfsa, key)[0]
+            key = word
+        
+        word = word[:len(word) - 1]
+
+        returnString += word + " "
+    returnString[:len(returnString) - 1]
+    
+    return returnString
 
 def main():
     """
@@ -64,6 +49,7 @@ def main():
 
     with open(f"{name}_sample.txt", "w") as file:
         file.write(output)
+
 
 if __name__ == "__main__":
     main()
