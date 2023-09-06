@@ -27,7 +27,7 @@ def generate(pfsa: dict[str, dict[str, float]], word_count: int) -> str:
         word = word[:len(word) - 1]
 
         returnString += word + " "
-    returnString[:len(returnString) - 1]
+    returnString = returnString.strip()
     
     return returnString
 

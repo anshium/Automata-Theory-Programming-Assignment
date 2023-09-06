@@ -36,5 +36,5 @@ $lines = @(
 )
 
 foreach ($line in $lines) {
-    echo "$line" | python.exe .\compiler8.py # >> output.txt
+    echo "$line" | python.exe .\compiler9.py # >> output.txt
 }

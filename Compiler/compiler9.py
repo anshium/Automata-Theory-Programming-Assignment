@@ -214,12 +214,10 @@ def checkAndGetCondPartEnd(string: str) -> list:
     
     for i in tokens:
         if(count % 2 == 0):
-            print(i)
             if(not isx(i[1])):
                 valid = 0
                 break
             if(tokens.index(i) < len(tokens) - 1):
-                print("Hello")
                 end_token = tokens[tokens.index(i) + 1]
                 
             else:
@@ -227,15 +225,13 @@ def checkAndGetCondPartEnd(string: str) -> list:
                 end_token = i 
                 valid = 1
         if(count % 2 == 1):
-            print("Here")
             if(i[1] not in symbols):
-                print("Hi", i[1])
                 end_token = i
                 valid = 1
                 break
         count += 1
-    f = 0
 
+    f = 0
     estimated_start_point = 0
     
     for i in tokens:
@@ -305,7 +301,6 @@ def checkGrammar(source_code, tokens) -> bool:
 
         find_result_if = s.find(" if ") # length is 4
         if(find_result_if == -1):
-            print(s.strip())
             if(" else" in s):
                 print("SyntaxError: An if was not found before an else.")
                 return 0
